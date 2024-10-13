@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>study</title>
+</head>
+<body>
+
+    <h1>CRUD OPERATIONS</h1>
+    <hr>
+    <br>
+
+    <fieldset>
+        <legend><h2>Collection Form</h2></legend>
+    
+    <form  id="form">
+
+        <h4>Name  : <input type="text" id ="name" name="name" placeholder="name"></h4>
+        
+        <h4>Age  : <input type="text" id ="age" name="age" placeholder="age"></h4>
+        
+        <h4>email : <input type="text" id="email" name="email" placeholder="email"></h4>
+        <br>
+        
+        <!-- <button onclick="Redirect()"> Submit</button> -->
+        <a href="survey.html">Submit</a>
+        </form>
+        
+        </fieldset>
+        
+        <div id="result"></div> <br>
+        
+        <script>
+            var row = null;
+function crud(){
+    
+    var dataEntered = createData();
+   //    document.getElementById("result").innerHTML=typeof(dataEntered);
+    if (dataEntered === false){
+        document.getElementById("result").innerText = "Enter all the fields";
+    }
+    else{
+            
+        // Retrieve existing data from local storage
+        var existingData = JSON.parse(localStorage.getItem("Study")) || [];
+
+        // To insert data into the table
+        if (row === null) {
+            existingData.push(dataEntered);
+            insert(dataEntered);
+            document.getElementById("result").innerHTML = "Data inserted";
+        } else {
+            // Update existing data
+            existingData[row.rowIndex - 1] = dataEntered;
+            update();
+            document.getElementById("result").innerHTML = "Data updated";
+        }
+
+        // Store the updated data in local storage
+        localStorage.setItem("Study", JSON.stringify(existingData));
+    }
+
+    document.getElementById("form").reset();
+
+    }
+    var form = document.getElementById("form");
+
+    form.addEventListener("submit", (e) => {
+    e.preventDefault();});
+
+
+
+//Pulling data from form and saving into variables name, age, email
+function createData(){
+    var name = document.getElementById("name").value;
+    var age = document.getElementById("age").value;
+    var email = document.getElementById("email").value;
+    if (name === "" || age === "" || email === ""){
+        //document.getElementById("result").innerText = "Enter all the fields";
+        return false;
+    }
+    else{
+        //document.getElementById("result").innerHTML =  name + " "+ age+ " "+ email; 
+        return {name, age, email};
+}
+}
+
+// Insert data into the table
+function insert(dataEntered) {
+    var table = document.getElementById("table");
+    var newRow = table.insertRow();
+
+    newRow.insertCell(0).innerHTML = dataEntered.name;
+    newRow.insertCell(1).innerHTML = dataEntered.age;
+    newRow.insertCell(2).innerHTML = dataEntered.email;
+    newRow.insertCell(3).innerHTML = `<button onclick="edit(this)">Edit</button> 
+                                       <button onclick="remove(this)">Delete</button>`;
+}
+
+
+// Edit function
+function edit(td) {
+    row = td.parentElement.parentElement;
+    document.getElementById("name").value = row.cells[0].innerHTML;
+    document.getElementById("age").value = row.cells[1].innerHTML;
+    document.getElementById("email").value = row.cells[2].innerHTML;
+}
+
+// Update function
+function update() {
+    row.cells[0].innerHTML = document.getElementById("name").value;
+    row.cells[1].innerHTML = document.getElementById("age").value;
+    row.cells[2].innerHTML = document.getElementById("email").value;
+    row = null;
+}
+
+// Delete function
+function remove(td) {
+    row = td.parentElement.parentElement;
+    document.getElementById("table").deleteRow(row.rowIndex);
+
+    // Remove the corresponding data from local storage
+    var existingData = JSON.parse(localStorage.getItem("tableData")) || [];
+    existingData.splice(row.rowIndex - 1, 1);
+    localStorage.setItem("tableData", JSON.stringify(existingData));
+
+    row = null;
+}
+
+// Populate table on page load
+document.addEventListener("DOMContentLoaded", function () {
+    var existingData = JSON.parse(localStorage.getItem("tableData")) || [];
+    existingData.forEach(function (data) {
+        insert(data);
+    });
+
+});
+
+        </script>
+</body>
+</html>
